@@ -1,113 +1,175 @@
+import {client} from "@/utils/sanity"
+import {Product} from "@/types";
+import {Button} from "@/components/ui/button";
+import {ShoppingCartIcon} from "lucide-react";
 import Image from "next/image";
+import headerImage from "../../public/header.webp";
+import event1 from "../../public/event1.webp";
 
-export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+import 'swiper/css';
+import ProductSlider from "@/components/ProductSlider";
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+export const revalidate = 120;
 
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+async function Home() {
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
+    async function getProducts() {
+        const CONTENT_QUERY = `*[_type == "product"] {
+              _id,
+              title,
+              slug,
+              type,
+              price,
+              featured_image{asset->{_id, url}},
+              category->{title, description},
+              _createdAt
+            }[0..10]`;
+        return await client.fetch(CONTENT_QUERY);
+    }
 
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
+    const products: Product[] = await getProducts() ?? [];
 
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+
+    return (
+        <main className="">
+            <header className={"px-32 py-16 flex gap-16 justify-between"}>
+                <div className="flex items-start flex-col justify-between pt-12 pb-8 w-full md:w-1/2">
+                    <div className="flex flex-col gap-10 items-start">
+                        <span className={"text-[blue] bg-[#e1edff] font-bold rounded px-6 py-2"}>
+                            Sale 70%
+                        </span>
+                        <h1 className={"text-6xl font-bold"}>An Industrial Take on Streetwear</h1>
+                        <p className={"text-muted-foreground w-[70%]"}>Anyone can beat you but no one can beat your
+                            outfit as long as you wear Dine outfits.</p>
+                        <Button className={"rounded-none text-lg flex gap-2 px-6 py-8"}>
+                            <ShoppingCartIcon/> Start Shopping
+                        </Button>
+                    </div>
+                    <div className={"grid grid-cols-4 gap-4 w-full"}>
+                        <Image src={"/featured1.webp"} alt="" width={100} height={100}/>
+                        <Image src={"/featured1.webp"} alt="" width={100} height={100}/>
+                        <Image src={"/featured1.webp"} alt="" width={100} height={100}/>
+                        <Image src={"/featured1.webp"} alt="" width={100} height={100}/>
+                    </div>
+                </div>
+                <div>
+                    <div className={"relative"}>
+                        <div className={"rounded-full bg-[#ffece3] w-[600px] h-[600px] absolute z-[-1] top-10 "}></div>
+                        <Image src={headerImage} alt={"header"} className={"w-[650px] h-[650px]"} height={650}
+                               width={650}/>
+                    </div>
+                </div>
+            </header>
+
+            <section className={"promotion-section px-32 py-16"}>
+                <div className={"flex flex-col justify-between items-center gap-4 mb-8"}>
+                    <small className={"uppercase text-[#0062f5] font-bold tracking-widest"}>promotion</small>
+                    <h2 className={"text-4xl font-bold"}>Our Promotions Events</h2>
+                </div>
+                <div className={"flex justify-between gap-8"}>
+                    <div className={" w-[53%] flex flex-col gap-4"}>
+                        <div className={"banner-card px-8 flex justify-between items-center bg-[#d6d6d8]"}>
+                            <div className={"tracking-wider"}>
+                                <h3 className={"uppercase text-3xl font-bold"}>get up to 60%</h3>
+                                <p className={""}>For the summer season</p>
+                            </div>
+                            <Image src={event1} alt={""}/>
+                        </div>
+
+                        <div className={"banner-card px-8 pt-12 pb-8 bg-gray-800"}>
+                            <div className={"tracking-wider flex flex-col gap-2 text-white items-center"}>
+                                <h3 className={"uppercase text-4xl font-bold mb-4"}>GET 30% Off</h3>
+                                <p className={"uppercase"}>USE PROMO CODE</p>
+                                <Button
+                                    className={"bg-gray-700 tracking-[.25em] text-lg px-16 font-bold uppercase hover:bg-gray-700"}>DINEWEEKENDSALE</Button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={" w-[47%] flex justify-between gap-4"}>
+                        <div className={"bg-orange-100 pt-6 w-1/2 flex flex-col justify-between"}>
+                            <div className={"px-4"}>
+                                <p>Flex Sweatshirt</p>
+                                <p>
+                                    <span className={"line-through"}>$100.00</span>
+                                    <span className={"ms-3 font-semibold"}>$75.00</span>
+                                </p>
+                            </div>
+                            <Image src={"/event2.webp"} alt={""} className={"w-full"} width={100} height={100}/>
+                        </div>
+                        <div className={"bg-gray-200 pt-6 w-1/2 flex flex-col justify-between"}>
+                            <div className={"px-4"}>
+                                <p>Flex Push Button Bomber</p>
+                                <p>
+                                    <span className={"line-through"}>$225.00</span>
+                                    <span className={"ms-3 font-semibold"}>$190.00</span>
+                                </p>
+                            </div>
+                            <Image src={"/event3.webp"} alt={""} className={"w-full"} width={100} height={100}/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section className={"products-section px-32 py-16"}>
+                <div className={"flex flex-col justify-between items-center gap-4 mb-8"}>
+                    <small className={"uppercase text-[#0062f5] font-bold tracking-widest"}>products</small>
+                    <h2 className={"text-4xl font-bold"}>Check What We Have</h2>
+                </div>
+
+                <div className={"mb-8"}>
+
+                    <ProductSlider products={products} />
+                </div>
+            </section>
+
+            <section className={"px-32 py-16"}>
+                <div className={"flex justify-end items-center gap-4 mb-12"}>
+                    <div className={"w-5/12"}>
+                        <h3 className={"text-4xl font-bold"}>Unique and Authentic Vintage Designer Jewellery</h3>
+                    </div>
+                </div>
+
+                <div className={"grid grid-cols-2 gap-12 place-items-center tracking-wider"}>
+                    <div className={"flex gap-24"}>
+                        <div className={"flex flex-col gap-16"}>
+                            <div>
+                                <p className={"font-bold text-lg mb-4"}>Using Good Quality Materials</p>
+                                <p className={"font-light"}>Lorem ipsum dolor sit amt, consectetur adipiscing elit.</p>
+                            </div>
+                            <div>
+                                <p className={"font-bold text-lg mb-4"}>Using Good Quality Materials</p>
+                                <p className={"font-light"}>Lorem ipsum dolor sit amt, consectetur adipiscing elit.</p>
+                            </div>
+                        </div>
+                        <div className={"flex flex-col gap-16"}>
+                            <div>
+                                <p className={"font-bold text-lg mb-4"}>Using Good Quality Materials</p>
+                                <p className={"font-light"}>Lorem ipsum dolor sit amt, consectetur adipiscing elit.</p>
+                            </div>
+                            <div>
+                                <p className={"font-bold text-lg mb-4"}>Using Good Quality Materials</p>
+                                <p className={"font-light"}>Lorem ipsum dolor sit amt, consectetur adipiscing elit.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={"grid grid-cols-2 place-items-center gap-12"}>
+                        <div className={"bg-gray-300"}>
+                            <Image src={"/event3.webp"} alt={""} width={100} height={100}/>
+                        </div>
+                        <div>
+                            <p className={"font-light mb-8"}>
+                                This piece is ethically crafted in our small family-owned workshop in Peru with unmatched attention to detail and care. The Natural color is the actual natural color of the fiber, undyed and 100% traceable.
+                            </p>
+
+                            <Button className={"rounded-none"}>
+                                See All Products
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    );
 }
+export default Home;
